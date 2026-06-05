@@ -3,21 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Congreso Food Control</title>
+  <title>Coyote adobado</title>
   <style>
     :root {
-      --bg: #f6f7f4;
+      --bg: #f5f5f5;
       --panel: #ffffff;
-      --ink: #222722;
-      --muted: #667063;
-      --line: #dfe4dc;
-      --brand: #176b57;
-      --brand-2: #d94f30;
-      --ok: #2b8a3e;
-      --warn: #b46b00;
-      --danger: #b42318;
-      --accent: #2457a6;
-      --shadow: 0 14px 38px rgba(28, 38, 32, .10);
+      --ink: #242424;
+      --muted: #6d6d6d;
+      --line: #dedede;
+      --brand: #b91c1c;
+      --brand-2: #ef4444;
+      --ok: #3f3f46;
+      --warn: #dc2626;
+      --danger: #991b1b;
+      --accent: #52525b;
+      --shadow: 0 14px 38px rgba(36, 36, 36, .12);
       --radius: 8px;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
     }
@@ -26,8 +26,8 @@
       margin: 0;
       color: var(--ink);
       background:
-        linear-gradient(135deg, rgba(23,107,87,.08), transparent 34%),
-        linear-gradient(315deg, rgba(217,79,48,.08), transparent 38%),
+        linear-gradient(135deg, rgba(185,28,28,.10), transparent 34%),
+        linear-gradient(315deg, rgba(82,82,91,.10), transparent 38%),
         var(--bg);
       min-height: 100vh;
     }
@@ -93,6 +93,7 @@
       color: #fff;
       background: linear-gradient(135deg, var(--brand), var(--brand-2));
       font-weight: 950;
+      font-size: 18px;
     }
     nav { display: grid; gap: 8px; }
     .nav-btn {
@@ -105,7 +106,7 @@
       justify-content: flex-start;
       padding: 10px;
     }
-    .nav-btn.active { background: #e8f1ed; color: var(--brand); }
+    .nav-btn.active { background: #fee2e2; color: var(--brand); }
     .side-foot {
       position: absolute;
       left: 18px;
@@ -150,7 +151,7 @@
       display: grid;
       place-items: center;
       font-size: 44px;
-      background: linear-gradient(135deg, rgba(23,107,87,.16), rgba(217,79,48,.12));
+      background: linear-gradient(135deg, rgba(185,28,28,.18), rgba(82,82,91,.12));
       border-bottom: 1px solid var(--line);
     }
     .product-body, .order, .panel { padding: 14px; }
@@ -332,7 +333,7 @@
 <body>
   <div class="app">
     <aside>
-      <div class="brand"><span class="mark">CF</span><span>Congreso Food</span></div>
+      <div class="brand"><span class="mark">🌶</span><span>Coyote adobado</span></div>
       <nav id="nav"></nav>
       <div class="side-foot">
         <button class="ghost" id="toggleSettings">Configuración</button>
@@ -357,6 +358,7 @@
           <span class="pill" id="orderTotals">Pedidos: 0</span>
           <span class="pill" id="kitchenState">Cocina abierta</span>
           <span class="pill" id="lastEvent">Sin eventos</span>
+          <button class="ghost" id="enableNotifications">Activar notificaciones</button>
           <button class="ghost" id="enableSound">Activar sonido</button>
         </div>
       </div>
@@ -389,7 +391,7 @@
     <div class="progress-modal" role="status" aria-live="polite">
       <div class="spinner"></div>
       <strong id="progressTitle">Procesando cambio</strong>
-      <span id="progressText">Registrando datos en Google Sheets...</span>
+      <span id="progressText">Registrando datos en la base...</span>
     </div>
   </div>
   <div class="toasts" id="toasts"></div>
@@ -423,6 +425,7 @@
     let activeView = "usuario";
     let payOrderId = null;
     let audioReady = false;
+    let reportCutFilter = "all";
     const channel = "BroadcastChannel" in window ? new BroadcastChannel("congreso-food-events") : null;
 
     function loadState() {
@@ -437,7 +440,9 @@
         deliveryWindows: [
           { start: "09:00", end: "12:00" },
           { start: "14:00", end: "18:00" }
-        ]
+        ],
+        currentCutId: "",
+        cuts: []
       };
     }
     function normalizeState(data) {
@@ -445,6 +450,8 @@
       next.products = Array.isArray(next.products) ? next.products : sampleProducts;
       next.orders = Array.isArray(next.orders) ? next.orders : [];
       next.config = { ...defaultConfig(), ...(next.config || {}) };
+      next.config.cuts = Array.isArray(next.config.cuts) ? next.config.cuts : [];
+      next.config.currentCutId = next.config.currentCutId || "";
       if (!Array.isArray(next.config.deliveryWindows) || !next.config.deliveryWindows.length) {
         next.config.deliveryWindows = defaultConfig().deliveryWindows;
       }
@@ -479,6 +486,7 @@
     }
     function notify(event) {
       document.getElementById("lastEvent").textContent = `${event.title}: ${event.body}`;
+      pushBrowserNotification(event);
       if (!VISUAL_TOASTS) {
         playSound(event.sound);
         return;
@@ -490,7 +498,30 @@
       setTimeout(() => toast.remove(), 4200);
       playSound(event.sound);
     }
-    function setProgress(show, title = "Procesando cambio", text = "Registrando datos en Google Sheets...") {
+    function pushBrowserNotification(event) {
+      if (!("Notification" in window) || Notification.permission !== "granted") return;
+      if (!["order", "status", "sync"].includes(event.type)) return;
+      try {
+        new Notification(event.title, {
+          body: event.body,
+          tag: `coyote-${event.type}`,
+          icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23b91c1c'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-size='34'%3E%F0%9F%8C%B6%3C/text%3E%3C/svg%3E"
+        });
+      } catch {
+        // Algunos navegadores móviles limitan notificaciones desde archivos locales.
+      }
+    }
+    async function enableNotifications() {
+      if (!("Notification" in window)) {
+        document.getElementById("lastEvent").textContent = "Notificaciones no disponibles en este navegador.";
+        return;
+      }
+      const permission = await Notification.requestPermission();
+      document.getElementById("lastEvent").textContent = permission === "granted"
+        ? "Notificaciones activadas."
+        : "Notificaciones no autorizadas.";
+    }
+    function setProgress(show, title = "Procesando cambio", text = "Registrando datos en la base...") {
       const modal = document.getElementById("progressModal");
       document.getElementById("progressTitle").textContent = title;
       document.getElementById("progressText").textContent = text;
@@ -572,6 +603,36 @@
         const [start, end] = line.split("-").map(part => part.trim());
         return /^\d{2}:\d{2}$/.test(start) && /^\d{2}:\d{2}$/.test(end) ? { start, end } : null;
       }).filter(Boolean);
+    }
+    function createCut() {
+      const openedAt = Date.now();
+      const cut = {
+        id: crypto.randomUUID(),
+        name: `Corte ${new Intl.DateTimeFormat("es-MX", { dateStyle: "short", timeStyle: "short" }).format(new Date(openedAt))}`,
+        openedAt,
+        closedAt: null
+      };
+      state.config.cuts.push(cut);
+      state.config.currentCutId = cut.id;
+      return cut;
+    }
+    function closeCurrentCut() {
+      const cut = state.config.cuts.find(item => item.id === state.config.currentCutId);
+      if (cut && !cut.closedAt) cut.closedAt = Date.now();
+      state.config.currentCutId = "";
+      return cut;
+    }
+    function applyKitchenCutTransition(wasOpen, willOpen) {
+      if (!wasOpen && willOpen) createCut();
+      if (wasOpen && !willOpen) closeCurrentCut();
+      if (willOpen && !state.config.currentCutId) createCut();
+    }
+    function cutLabel(cut) {
+      const opened = new Intl.DateTimeFormat("es-MX", { dateStyle: "short", timeStyle: "short" }).format(new Date(cut.openedAt));
+      const closed = cut.closedAt
+        ? new Intl.DateTimeFormat("es-MX", { timeStyle: "short" }).format(new Date(cut.closedAt))
+        : "abierto";
+      return `${cut.name || "Corte"} · ${opened} - ${closed}`;
     }
     function render() {
       const renderers = { usuario: renderUser, recepcion: renderReception, cocina: renderKitchen, entrega: renderDelivery, reportes: renderReports, admin: renderAdmin };
@@ -669,7 +730,12 @@
         </div>`;
     }
     function renderReports() {
-      const delivered = state.orders.filter(order => order.status === "entregado");
+      const cuts = [...state.config.cuts].sort((a, b) => (b.openedAt || 0) - (a.openedAt || 0));
+      const selectedCutExists = reportCutFilter === "all" || cuts.some(cut => cut.id === reportCutFilter);
+      if (!selectedCutExists) reportCutFilter = "all";
+      const delivered = state.orders
+        .filter(order => order.status === "entregado")
+        .filter(order => reportCutFilter === "all" ? true : (order.cutId || "") === reportCutFilter);
       const paidOrders = delivered.filter(order => order.payment);
       const byPayment = paidOrders.reduce((acc, order) => {
         const method = order.payment?.method || "Sin forma";
@@ -695,6 +761,17 @@
       const changeTotal = paidOrders.reduce((sum, order) => sum + Number(order.payment?.change || 0), 0);
       const productQty = productRows.reduce((sum, item) => sum + item.qty, 0);
       document.getElementById("content").innerHTML = `
+        <div class="panel">
+          <div class="row" style="justify-content:space-between">
+            <h2>Corte</h2>
+            <label style="min-width:min(360px,100%)">Seleccionar corte
+              <select id="cutFilter">
+                <option value="all" ${reportCutFilter === "all" ? "selected" : ""}>Todos los cortes</option>
+                ${cuts.map(cut => `<option value="${cut.id}" ${reportCutFilter === cut.id ? "selected" : ""}>${cutLabel(cut)}</option>`).join("")}
+              </select>
+            </label>
+          </div>
+        </div>
         <div class="metric-grid">
           <div class="metric"><span>Pedidos pagados</span><strong>${paidOrders.length}</strong></div>
           <div class="metric"><span>Total venta</span><strong>${money(grossTotal)}</strong></div>
@@ -730,6 +807,7 @@
     function orderCard(order) {
       const statusLabels = { recibido: "No atendido", cocina: "Por iniciar", preparacion: "En preparación", listo: "Listo", entregado: "Entregado", cancelado: "Cancelado" };
       const previous = previousStatus(order);
+      const showWhatsapp = ["recepcion", "entrega"].includes(activeView);
       const actions = {
         recibido: `<button data-status="${order.id}:cocina" class="accent">Enviar a cocina</button>`,
         cocina: `<button data-status="${order.id}:preparacion" class="accent">Iniciar preparación</button>`,
@@ -755,6 +833,7 @@
           <div class="row" style="justify-content:space-between">
             <strong>${money(orderTotal(order))}</strong>
             <div class="row">
+              ${showWhatsapp ? `<button class="ghost" data-whatsapp="${order.id}">WhatsApp</button>` : ""}
               ${canBack ? `<button class="ghost" data-back="${order.id}">Regresar</button>` : ""}
               ${canCancel ? `<button class="danger" data-cancel="${order.id}">Cancelar</button>` : ""}
               ${actions[order.status] || ""}
@@ -766,6 +845,13 @@
       const currentIndex = STATUS_FLOW.indexOf(order.status);
       if (currentIndex > 0) return STATUS_FLOW[currentIndex - 1];
       return "";
+    }
+    function whatsappUrl(order) {
+      const phone = String(order.customerPhone || "").replace(/\D/g, "");
+      const message = activeView === "recepcion"
+        ? `Hola ${order.customerName}, recibimos tu pedido de Coyote adobado para entrega a las ${order.pickupTime} en el área de comida del Simposium de CAM BC. Total: ${money(orderTotal(order))}.`
+        : `Hola ${order.customerName}, tu pedido de Coyote adobado está listo para entrega en el área de comida del Simposium de CAM BC. Total: ${money(orderTotal(order))}.`;
+      return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     }
     function renderAdmin() {
       document.getElementById("content").innerHTML = `
@@ -791,6 +877,7 @@
             </form>
             <form class="panel form-grid" id="configForm">
               <h2>Operacion</h2>
+              <div class="empty">${state.config.currentCutId ? `Corte activo: ${cutLabel(state.config.cuts.find(cut => cut.id === state.config.currentCutId))}` : "Sin corte activo. Al abrir cocina se iniciará uno nuevo."}</div>
               <label>Cocina
                 <select id="kitchenOpen">
                   <option value="true" ${state.config.kitchenOpen ? "selected" : ""}>Abierta</option>
@@ -845,6 +932,7 @@
         pickupTime: form.pickupTime.value,
         items: lines,
         status: "recibido",
+        cutId: state.config.currentCutId || "",
         createdAt: Date.now(),
         history: [{ status: "recibido", at: Date.now() }]
       };
@@ -938,13 +1026,13 @@
         products: "Guardando productos",
         config: "Guardando operación"
       };
-      setProgress(true, labels[action] || "Procesando cambio", "Registrando datos en Google Sheets...");
+      setProgress(true, labels[action] || "Procesando cambio", "Registrando datos en la base...");
       try {
         await submitHiddenForm(url, { action, payload: JSON.stringify(payload) });
-        document.getElementById("syncStatus").textContent = "Enviado a Sheets";
+        document.getElementById("syncStatus").textContent = "Cambio registrado";
         return true;
       } catch (error) {
-        document.getElementById("syncStatus").textContent = `Error Sheets: ${error.message}`;
+        document.getElementById("syncStatus").textContent = `Error de registro: ${error.message}`;
         emit("sync", "Error al guardar", error.message, "soft");
         return false;
       } finally {
@@ -953,7 +1041,7 @@
     }
     function submitHiddenForm(url, fields) {
       return new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => reject(new Error("Google Sheets tardó demasiado en responder")), 15000);
+        const timeout = setTimeout(() => reject(new Error("El servicio tardó demasiado en responder")), 15000);
         fetch(url, {
           method: "POST",
           mode: "no-cors",
@@ -977,7 +1065,7 @@
         const timeout = setTimeout(() => {
           delete window[callback];
           script.remove();
-          reject(new Error("Google Sheets no respondió"));
+          reject(new Error("El servicio no respondió"));
         }, 12000);
         window[callback] = data => {
           clearTimeout(timeout);
@@ -989,7 +1077,7 @@
           clearTimeout(timeout);
           delete window[callback];
           script.remove();
-          reject(new Error("No se pudo leer Sheets"));
+          reject(new Error("No se pudo leer la base"));
         };
         script.src = `${url}${separator}${query.toString()}`;
         document.body.appendChild(script);
@@ -1008,8 +1096,8 @@
         state = normalizeState(state);
         saveState(false);
         const newOrders = state.orders.filter(order => !knownIds.has(order.id) && order.status === "recibido");
-        document.getElementById("syncStatus").textContent = silent ? `Sincronizado ${nowTime()}` : "Conectado a Google Sheets";
-        if (!silent) emit("sync", "Sincronización completa", "Productos y pedidos cargados desde Sheets.", "soft");
+        document.getElementById("syncStatus").textContent = silent ? `Sincronizado ${nowTime()}` : "Conectado a la base";
+        if (!silent) emit("sync", "Sincronización completa", "Productos y pedidos cargados.", "soft");
         if (silent && newOrders.length) emit("order", "Pedido nuevo no atendido", `${newOrders.length} pedido(s) entraron a recepción.`, "new");
         render();
       } catch {
@@ -1032,6 +1120,10 @@
       if (target.dataset.status) {
         const [id, status] = target.dataset.status.split(":");
         updateStatus(id, status);
+      }
+      if (target.dataset.whatsapp) {
+        const order = state.orders.find(item => item.id === target.dataset.whatsapp);
+        if (order) window.open(whatsappUrl(order), "_blank", "noopener");
       }
       if (target.dataset.back) backOrder(target.dataset.back);
       if (target.dataset.cancel) {
@@ -1097,12 +1189,19 @@
           emit("config", "Horarios inválidos", "Usa rangos como 09:00-12:00.", "soft");
           return;
         }
-        const previousConfig = { ...state.config, deliveryWindows: [...state.config.deliveryWindows] };
+        const previousConfig = {
+          ...state.config,
+          deliveryWindows: [...state.config.deliveryWindows],
+          cuts: state.config.cuts.map(cut => ({ ...cut }))
+        };
+        const wasOpen = state.config.kitchenOpen;
         state.config = {
+          ...state.config,
           kitchenOpen: kitchenOpen.value === "true",
           slotMinutes: Number(slotMinutes.value || 15),
           deliveryWindows: windows
         };
+        applyKitchenCutTransition(wasOpen, state.config.kitchenOpen);
         const saved = await syncRemote("config", state.config);
         if (!saved) {
           state.config = previousConfig;
@@ -1131,6 +1230,12 @@
     document.addEventListener("input", event => {
       if (event.target.id === "amountReceived") calcChange();
     });
+    document.addEventListener("change", event => {
+      if (event.target.id === "cutFilter") {
+        reportCutFilter = event.target.value;
+        renderReports();
+      }
+    });
     document.getElementById("closePay").addEventListener("click", () => document.getElementById("payModal").classList.remove("show"));
     document.getElementById("toggleSettings").addEventListener("click", () => document.getElementById("settings").classList.toggle("show"));
     document.getElementById("saveApi").addEventListener("click", () => {
@@ -1152,6 +1257,7 @@
       audioReady = true;
       emit("sound", "Sonido activado", "Las alertas emitirán tonos diferenciados.", "ready");
     });
+    document.getElementById("enableNotifications").addEventListener("click", enableNotifications);
     window.addEventListener("storage", event => {
       if (event.key === STORE_KEY && event.newValue) {
         state = normalizeState(JSON.parse(event.newValue));
