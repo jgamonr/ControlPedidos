@@ -917,6 +917,11 @@
       document.getElementById("amountReceived").value = orderTotal(order).toFixed(2);
       document.getElementById("payModal").classList.add("show");
       calcChange();
+      setTimeout(() => {
+        const input = document.getElementById("amountReceived");
+        input.focus();
+        input.select();
+      }, 50);
     }
     function calcChange() {
       const order = state.orders.find(o => o.id === payOrderId);
