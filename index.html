@@ -847,7 +847,9 @@
       return "";
     }
     function whatsappUrl(order) {
-      const phone = String(order.customerPhone || "").replace(/\D/g, "");
+      let phone = String(order.customerPhone || "").replace(/\D/g, "");
+      if (phone.length === 10) phone = `52${phone}`;
+      if (phone.length === 11 && phone.startsWith("1")) phone = `52${phone.slice(1)}`;
       const message = activeView === "recepcion"
         ? `Hola ${order.customerName}, recibimos tu pedido de Coyote adobado para entrega a las ${order.pickupTime} en el área de comida del Simposium de CAM BC. Total: ${money(orderTotal(order))}.`
         : `Hola ${order.customerName}, tu pedido de Coyote adobado está listo para entrega en el área de comida del Simposium de CAM BC. Total: ${money(orderTotal(order))}.`;
