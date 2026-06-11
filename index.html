@@ -328,21 +328,54 @@
       .topbar { align-items: flex-start; flex-direction: column; }
       th:nth-child(3), td:nth-child(3) { display: none; }
     }
+  
+    /* Modern photo layout */
+    body {
+      background:
+        linear-gradient(180deg, rgba(20, 12, 8, .66), rgba(255, 250, 243, .90) 36%, rgba(255, 250, 243, .98)),
+        url("https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1800&q=80") center top / cover fixed,
+        #160f0c;
+    }
+    button { border-radius: 8px; background: linear-gradient(135deg, #b91c1c, #7f1d1d); box-shadow: 0 10px 22px rgba(127,29,29,.20); transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease; }
+    button:hover:not(:disabled) { filter: none; transform: translateY(-1px); box-shadow: 0 14px 28px rgba(127,29,29,.26); }
+    input, select, textarea { background: rgba(255,255,255,.90); border-radius: 8px !important; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: rgba(185,28,28,.45) !important; box-shadow: 0 0 0 4px rgba(185,28,28,.10); }
+    aside { background: rgba(255, 250, 243, .88); border-right-color: rgba(255,255,255,.50); box-shadow: 14px 0 36px rgba(38,20,11,.12); }
+    main { background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,250,243,.74)); }
+    .topbar { padding: 20px; border: 1px solid rgba(255,255,255,.42); border-radius: 8px; background: linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.72)); box-shadow: 0 20px 50px rgba(38,20,11,.16); backdrop-filter: blur(16px); }
+    .mark { background: linear-gradient(135deg, #b91c1c, #f59e0b); box-shadow: 0 12px 26px rgba(185,28,28,.24); }
+    .nav-btn.active { background: #fff0df; color: #991b1b; }
+    .pill, .metric, table { background: rgba(255,255,255,.86); }
+    .product, .order, .panel, .cart { background: rgba(255, 250, 243, .94); border-color: rgba(255,255,255,.58); box-shadow: 0 20px 50px rgba(38,20,11,.16); backdrop-filter: blur(14px); }
+    .product { grid-template-rows: 190px 1fr; transition: transform .18s ease, box-shadow .18s ease; }
+    .product:hover { transform: translateY(-3px); box-shadow: 0 24px 58px rgba(38,20,11,.22); }
+    .product-art { position: relative; overflow: hidden; background: linear-gradient(135deg, rgba(185,28,28,.18), rgba(245,158,11,.16)); }
+    .product-art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgba(26,15,11,.52)); pointer-events: none; }
+    .product-art img { width: 100%; height: 100%; object-fit: cover; display: block; transform: scale(1.01); }
+    .product-art .emoji { position: absolute; right: 12px; bottom: 10px; z-index: 1; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 8px; background: rgba(255,255,255,.88); font-size: 25px; box-shadow: 0 10px 24px rgba(0,0,0,.18); }
+    .product-body { background: linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,250,243,.96)); }
+    .price { color: #7f1d1d; }
+    .ghost { background: #fff4e5; color: var(--ink); box-shadow: none; }
+    .accent { background: linear-gradient(135deg, #52525b, #27272a); }
+    .warn { background: linear-gradient(135deg, #dc2626, #991b1b); }
+    .danger { background: linear-gradient(135deg, #991b1b, #5f1212); }
+    .product-thumb { width: 46px; height: 36px; object-fit: cover; border-radius: 8px; vertical-align: middle; margin-right: 8px; box-shadow: 0 6px 14px rgba(38,20,11,.16); }
+    .modal-backdrop { background: rgba(20,12,8,.62); backdrop-filter: blur(8px); }
   </style>
 </head>
 <body>
   <div class="app">
     <aside>
-      <div class="brand"><span class="mark">🌶</span><span>Coyote adobado</span></div>
+      <div class="brand"><span class="mark">CA</span><span>Coyote adobado</span></div>
       <nav id="nav"></nav>
       <div class="side-foot">
-        <button class="ghost" id="toggleSettings">Configuración</button>
+        <button class="ghost" id="toggleSettings">Configuracion</button>
         <div class="settings" id="settings">
           <label>URL Apps Script
-            <input id="apiUrl" placeholder="https://script.google.com/macros/s/.../exec">
+            <input id="apiUrl" placeholder="https://script.google.com/macros/s/AKfycbw8zBnGEYv3eOGN4W8xsbpmjPrz0uQTDtmGcrqjdqyfeyMClN08Ne6GIQ2Wx19kskE7/exec">
           </label>
           <button id="saveApi" class="accent">Guardar y sincronizar</button>
-          <button id="testApi" class="ghost">Probar conexión</button>
+          <button id="testApi" class="ghost">Probar conexion</button>
           <span id="syncStatus">Modo local activo</span>
         </div>
       </div>
@@ -351,7 +384,7 @@
       <div class="topbar">
         <div>
           <h1 id="viewTitle">Pedido de comida</h1>
-          <p class="sub" id="viewSub">Productos disponibles con descuento automático de stock.</p>
+          <p class="sub" id="viewSub">Productos disponibles con descuento automatico de stock.</p>
         </div>
         <div class="toolbar">
           <span class="pill" id="clock"></span>
@@ -399,26 +432,24 @@
   <script>
     const STORE_KEY = "congreso-food-v1";
     const API_KEY = "congreso-food-api-url";
-    const DEFAULT_API_URL = "https://script.google.com/macros/s/AKfycby7si9hqvx14rSYG_ER8UUHmDJf4NTIVT7qVAvXtVSWHysVgecKxJvpTcXFjiXXIJrrIQ/exec";
+    const DEFAULT_API_URL = "https://script.google.com/macros/s/AKfycbw8zBnGEYv3eOGN4W8xsbpmjPrz0uQTDtmGcrqjdqyfeyMClN08Ne6GIQ2Wx19kskE7/exec";
     const VISUAL_TOASTS = false;
     const STATUS_FLOW = ["recibido", "cocina", "preparacion", "listo", "entregado"];
-    const icons = {
-      usuario: "🧾", recepcion: "☑", cocina: "◴", entrega: "▣", reportes: "Σ", admin: "⚙"
-    };
+    const icons = { usuario: "US", recepcion: "RC", cocina: "CO", entrega: "EN", reportes: "RE", admin: "AD" };
     const views = [
-      ["usuario", "Usuario", "Pedido de comida", "Productos disponibles con descuento automático de stock."],
-      ["recepcion", "Recepción", "Recepción", "Recibe pedidos y envíalos a cocina."],
+      ["usuario", "Usuario", "Pedido de comida", "Productos disponibles con descuento automatico de stock."],
+      ["recepcion", "Recepcion", "Recepcion", "Recibe pedidos y envialos a cocina."],
       ["cocina", "Cocina", "Cocina", "Pedidos agrupados por estado del proceso."],
       ["entrega", "Entrega", "Entrega", "Registra pago, cambio y entrega final."],
       ["reportes", "Reportes", "Reportes", "Totales recibidos por pago y acumulados por producto."],
-      ["admin", "Administración", "Administración", "Alta, edición y eliminación de productos."]
+      ["admin", "Administracion", "Administracion", "Alta, edicion y eliminacion de productos."]
     ];
     const sampleProducts = [
-      { id: crypto.randomUUID(), name: "Torta de pierna", price: 95, stock: 18, emoji: "🥪", active: true },
-      { id: crypto.randomUUID(), name: "Bowl vegetariano", price: 115, stock: 14, emoji: "🥗", active: true },
-      { id: crypto.randomUUID(), name: "Café americano", price: 45, stock: 40, emoji: "☕", active: true },
-      { id: crypto.randomUUID(), name: "Agua natural", price: 25, stock: 60, emoji: "💧", active: true },
-      { id: crypto.randomUUID(), name: "Galleta artesanal", price: 35, stock: 24, emoji: "🍪", active: true }
+      { id: crypto.randomUUID(), name: "Torta de pierna", price: 95, stock: 18, emoji: "", active: true },
+      { id: crypto.randomUUID(), name: "Bowl vegetariano", price: 115, stock: 14, emoji: "", active: true },
+      { id: crypto.randomUUID(), name: "Cafe americano", price: 45, stock: 40, emoji: "", active: true },
+      { id: crypto.randomUUID(), name: "Agua natural", price: 25, stock: 60, emoji: "", active: true },
+      { id: crypto.randomUUID(), name: "Galleta artesanal", price: 35, stock: 24, emoji: "", active: true }
     ];
     let state = normalizeState(loadState());
     let cart = {};
@@ -427,6 +458,33 @@
     let audioReady = false;
     let reportCutFilter = "all";
     const channel = "BroadcastChannel" in window ? new BroadcastChannel("congreso-food-events") : null;
+
+    const PRODUCT_IMAGE_FALLBACKS = [
+      { words: ["burrito", "burro"], url: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=900&q=80" },
+      { words: ["taco", "quesadilla"], url: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=900&q=80" },
+      { words: ["torta", "sandwich"], url: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=900&q=80" },
+      { words: ["bowl", "ensalada", "vegetariano"], url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=80" },
+      { words: ["cafe", "capuchino", "americano"], url: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80" },
+      { words: ["agua", "bebida", "refresco"], url: "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&w=900&q=80" },
+      { words: ["galleta", "postre", "pan"], url: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=900&q=80" }
+    ];
+    const DEFAULT_PRODUCT_IMAGE = "https://images.unsplash.com/photo-1565299507177-b0ac66763828?auto=format&fit=crop&w=900&q=80";
+    function normalizeProductText(value) {
+      return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    }
+    function escapeAttr(value) {
+      return String(value || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+    }
+    function productInitial(product) {
+      return normalizeProductText(product.name).slice(0, 1).toUpperCase() || "C";
+    }
+    function productImage(product) {
+      const direct = product.imageUrl || product.image || product.photo || product.picture;
+      if (direct) return direct;
+      const name = normalizeProductText(product.name);
+      const match = PRODUCT_IMAGE_FALLBACKS.find(item => item.words.some(word => name.includes(word)));
+      return match ? match.url : DEFAULT_PRODUCT_IMAGE;
+    }
 
     function loadState() {
       const saved = localStorage.getItem(STORE_KEY);
@@ -463,7 +521,7 @@
     function saveState(announce = true) {
       state.updatedAt = Date.now();
       localStorage.setItem(STORE_KEY, JSON.stringify(state));
-      if (announce) emit("sync", "Datos actualizados", "Los módulos recibieron el cambio.", "soft");
+      if (announce) emit("sync", "Datos actualizados", "Los modulos recibieron el cambio.", "soft");
       renderIndicators();
     }
     function money(value) {
@@ -508,7 +566,7 @@
           icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23b91c1c'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-size='34'%3E%F0%9F%8C%B6%3C/text%3E%3C/svg%3E"
         });
       } catch {
-        // Algunos navegadores móviles limitan notificaciones desde archivos locales.
+        // Algunos navegadores moviles limitan notificaciones desde archivos locales.
       }
     }
     async function enableNotifications() {
@@ -573,7 +631,7 @@
         return acc;
       }, {});
       document.getElementById("orderTotals").textContent =
-        `No atendidos: ${counts.recibido || 0} · Por iniciar: ${counts.cocina || 0} · Preparación: ${counts.preparacion || 0} · Listos: ${counts.listo || 0}`;
+        `No atendidos: ${counts.recibido || 0} - Por iniciar: ${counts.cocina || 0} - Preparacion: ${counts.preparacion || 0} - Listos: ${counts.listo || 0}`;
       document.getElementById("kitchenState").textContent = state.config.kitchenOpen ? "Cocina abierta" : "Cocina cerrada";
     }
     function availableProducts() {
@@ -632,7 +690,7 @@
       const closed = cut.closedAt
         ? new Intl.DateTimeFormat("es-MX", { timeStyle: "short" }).format(new Date(cut.closedAt))
         : "abierto";
-      return `${cut.name || "Corte"} · ${opened} - ${closed}`;
+      return `${cut.name || "Corte"} - ${opened} - ${closed}`;
     }
     function render() {
       const renderers = { usuario: renderUser, recepcion: renderReception, cocina: renderKitchen, entrega: renderDelivery, reportes: renderReports, admin: renderAdmin };
@@ -651,7 +709,7 @@
           <div class="grid products">
             ${items.map(product => `
               <article class="product">
-                <div class="product-art">${product.emoji || "🍽"}</div>
+                <div class="product-art"><img src="${escapeAttr(productImage(product))}" alt="${escapeAttr(product.name)}" loading="lazy"></div>
                 <div class="product-body">
                   <div class="row" style="justify-content:space-between">
                     <h3>${product.name}</h3>
@@ -659,7 +717,7 @@
                   </div>
                   <div class="stock">${product.stock} disponibles</div>
                   <div class="qty">
-                    <button class="icon-btn ghost" data-dec="${product.id}" title="Quitar">−</button>
+                    <button class="icon-btn ghost" data-dec="${product.id}" title="Quitar">-</button>
                     <strong>${cart[product.id] || 0}</strong>
                     <button class="icon-btn" data-inc="${product.id}" title="Agregar" ${(cart[product.id] || 0) >= product.stock ? "disabled" : ""}>+</button>
                   </div>
@@ -669,21 +727,24 @@
           </div>
           <form class="cart" id="orderForm">
             <h2>Pedido</h2>
-            ${state.config.kitchenOpen ? "" : `<div class="empty">La cocina está cerrada. Puedes consultar el menú cuando administración la abra.</div>`}
+            ${state.config.kitchenOpen ? "" : `<div class="empty">La cocina esta cerrada. Puedes consultar el menu cuando administracion la abra.</div>`}
             <label>Nombre
-              <input id="customerName" required autocomplete="name">
+              <input id="customerName" name="customerName" required autocomplete="name">
             </label>
-            <label>Teléfono
-              <input id="customerPhone" required inputmode="tel" autocomplete="tel">
+            <label>Telefono
+              <input id="customerPhone" name="customerPhone" required inputmode="tel" autocomplete="tel">
+            </label>
+            <label>Departamento
+              <input id="customerDepartment" name="customerDepartment" required autocomplete="organization">
             </label>
             <label>Hora de entrega
-              <select id="pickupTime" required ${slots.length ? "" : "disabled"}>
+              <select id="pickupTime" name="pickupTime" required ${slots.length ? "" : "disabled"}>
                 ${slots.map(slot => `<option value="${slot}" ${slot === suggestTime(slots) ? "selected" : ""}>${slot}</option>`).join("")}
               </select>
             </label>
             <div>
               ${lines.map(item => `
-                <div class="cart-line"><span>${item.qty} × ${item.name}</span><strong>${money(item.qty * item.price)}</strong></div>
+                <div class="cart-line"><span>${item.qty} x ${item.name}</span><strong>${money(item.qty * item.price)}</strong></div>
               `).join("") || `<div class="empty">Agrega productos al pedido.</div>`}
             </div>
             <div class="total"><span>Total</span><span>${money(total)}</span></div>
@@ -706,7 +767,7 @@
     function renderKitchen() {
       const processGroups = [
         ["cocina", "Por iniciar"],
-        ["preparacion", "En preparación"],
+        ["preparacion", "En preparacion"],
         ["listo", "Listos para entrega"]
       ];
       const orders = state.orders.filter(o => processGroups.some(([status]) => status === o.status)).sort((a, b) => a.pickupTime.localeCompare(b.pickupTime));
@@ -805,12 +866,12 @@
         </div>`;
     }
     function orderCard(order) {
-      const statusLabels = { recibido: "No atendido", cocina: "Por iniciar", preparacion: "En preparación", listo: "Listo", entregado: "Entregado", cancelado: "Cancelado" };
+      const statusLabels = { recibido: "No atendido", cocina: "Por iniciar", preparacion: "En preparacion", listo: "Listo", entregado: "Entregado", cancelado: "Cancelado" };
       const previous = previousStatus(order);
       const showWhatsapp = ["recepcion", "entrega"].includes(activeView);
       const actions = {
         recibido: `<button data-status="${order.id}:cocina" class="accent">Enviar a cocina</button>`,
-        cocina: `<button data-status="${order.id}:preparacion" class="accent">Iniciar preparación</button>`,
+        cocina: `<button data-status="${order.id}:preparacion" class="accent">Iniciar preparacion</button>`,
         preparacion: `<button data-status="${order.id}:listo">Marcar listo</button>`,
         listo: `<button data-pay="${order.id}" class="warn">Entregar</button>`,
         entregado: `<span class="badge">Pagado: ${order.payment?.method || "N/D"}</span>`,
@@ -823,12 +884,12 @@
           <div class="order-top">
             <div>
               <h3>${order.customerName}</h3>
-              <div class="sub">${order.customerPhone} · entrega ${order.pickupTime}</div>
+              <div class="sub">${order.customerPhone} - ${order.customerDepartment || "Sin departamento"} - entrega ${order.pickupTime}</div>
             </div>
             <span class="badge">${statusLabels[order.status]}</span>
           </div>
           <div>
-            ${order.items.map(item => `<div class="item-line"><span>${item.qty} × ${item.name}</span><strong>${money(item.price * item.qty)}</strong></div>`).join("")}
+            ${order.items.map(item => `<div class="item-line"><span>${item.qty} x ${item.name}</span><strong>${money(item.price * item.qty)}</strong></div>`).join("")}
           </div>
           <div class="row" style="justify-content:space-between">
             <strong>${money(orderTotal(order))}</strong>
@@ -846,14 +907,115 @@
       if (currentIndex > 0) return STATUS_FLOW[currentIndex - 1];
       return "";
     }
-    function whatsappUrl(order) {
+    function whatsappPhone(order) {
       let phone = String(order.customerPhone || "").replace(/\D/g, "");
       if (phone.length === 10) phone = `52${phone}`;
       if (phone.length === 11 && phone.startsWith("1")) phone = `52${phone.slice(1)}`;
-      const message = activeView === "recepcion"
-        ? `Hola ${order.customerName}, recibimos tu pedido de Coyote adobado para entrega a las ${order.pickupTime} en el área de comida del Simposium de CAM BC. Total: ${money(orderTotal(order))}.`
-        : `Hola ${order.customerName}, tu pedido de Coyote adobado está listo para entrega en el área de comida del Simposium de CAM BC. Total: ${money(orderTotal(order))}.`;
-      return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+      return phone;
+    }
+    function orderShareText(order) {
+      const intro = activeView === "recepcion"
+        ? `Hola ${order.customerName}, recibimos tu pedido de Coyote adobado.`
+        : `Hola ${order.customerName}, tu pedido de Coyote adobado esta listo para entrega.`;
+      const lines = order.items.map(item => `${item.qty} x ${item.name} - ${money(item.price * item.qty)}`).join("\n");
+      return `${intro}\n\nDepartamento: ${order.customerDepartment || "Sin departamento"}\nEntrega: ${order.pickupTime}\nTotal: ${money(orderTotal(order))}\n\n${lines}`;
+    }
+    function whatsappUrl(order) {
+      return `https://wa.me/${whatsappPhone(order)}?text=${encodeURIComponent(orderShareText(order))}`;
+    }
+    function roundRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+    function orderImageBlob(order) {
+      return new Promise(resolve => {
+        const width = 900;
+        const lineHeight = 48;
+        const itemRows = Math.max(1, order.items.length);
+        const headerBottom = 330;
+        const itemsTop = 386;
+        const totalTop = itemsTop + itemRows * lineHeight + 54;
+        const height = totalTop + 104;
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        const gradient = ctx.createLinearGradient(0, 0, width, height);
+        gradient.addColorStop(0, "#7f1d1d");
+        gradient.addColorStop(.48, "#b91c1c");
+        gradient.addColorStop(1, "#f59e0b");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = "rgba(255, 250, 243, .96)";
+        roundRect(ctx, 38, 38, width - 76, height - 76, 24);
+        ctx.fill();
+        ctx.fillStyle = "#7f1d1d";
+        ctx.font = "800 34px Arial, sans-serif";
+        ctx.fillText("Coyote adobado", 76, 96);
+        ctx.fillStyle = "#201714";
+        ctx.font = "800 42px Arial, sans-serif";
+        ctx.fillText(`Pedido de ${order.customerName || "cliente"}`, 76, 160);
+        ctx.font = "700 26px Arial, sans-serif";
+        ctx.fillStyle = "#746761";
+        ctx.fillText(`Departamento: ${order.customerDepartment || "Sin departamento"}`, 76, 204);
+        ctx.fillText(`Entrega: ${order.pickupTime || "pendiente"}`, 76, 244);
+        ctx.fillText(`Telefono: ${order.customerPhone || ""}`, 76, 284);
+        ctx.strokeStyle = "rgba(127, 29, 29, .18)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(76, headerBottom);
+        ctx.lineTo(width - 76, headerBottom);
+        ctx.stroke();
+        let y = itemsTop;
+        ctx.font = "700 25px Arial, sans-serif";
+        ctx.fillStyle = "#201714";
+        order.items.forEach(item => {
+          const label = `${item.qty} x ${item.name}`;
+          const shortLabel = label.length > 34 ? `${label.slice(0, 31)}...` : label;
+          ctx.fillText(shortLabel, 76, y);
+          ctx.textAlign = "right";
+          ctx.fillText(money(item.price * item.qty), width - 76, y);
+          ctx.textAlign = "left";
+          y += lineHeight;
+        });
+        ctx.strokeStyle = "rgba(127, 29, 29, .18)";
+        ctx.beginPath();
+        ctx.moveTo(76, totalTop - 34);
+        ctx.lineTo(width - 76, totalTop - 34);
+        ctx.stroke();
+        ctx.fillStyle = "#7f1d1d";
+        ctx.font = "900 42px Arial, sans-serif";
+        ctx.fillText("Total", 76, totalTop);
+        ctx.textAlign = "right";
+        ctx.fillText(money(orderTotal(order)), width - 76, totalTop);
+        ctx.textAlign = "left";
+        canvas.toBlob(blob => resolve(blob), "image/png", .95);
+      });
+    }
+    async function shareWhatsappOrder(order) {
+      const text = orderShareText(order);
+      const phone = whatsappPhone(order);
+      try {
+        const blob = await orderImageBlob(order);
+        const file = new File([blob], `pedido-${order.id || Date.now()}.png`, { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+          await navigator.share({ files: [file], text, title: "Pedido Coyote adobado" });
+          return;
+        }
+      } catch (error) {
+        console.warn("No se pudo compartir imagen", error);
+      }
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+      emit("sync", "WhatsApp abierto", "Tu navegador no permite adjuntar imagen automaticamente; se envio el texto.", "soft");
     }
     function renderAdmin() {
       document.getElementById("content").innerHTML = `
@@ -865,7 +1027,8 @@
               <label>Nombre<input id="productName" required></label>
               <label>Precio<input id="productPrice" type="number" min="0" step="0.01" required></label>
               <label>Stock<input id="productStock" type="number" min="0" step="1" required></label>
-              <label>Icono visual<input id="productEmoji" maxlength="3" placeholder="🍽"></label>
+              <label>Etiqueta corta<input id="productEmoji" maxlength="3" placeholder="CA"></label>
+              <label>Foto del producto<input id="productImageUrl" type="url" placeholder="https://..."></label>
               <label>Estado
                 <select id="productActive">
                   <option value="true">Activo</option>
@@ -879,7 +1042,7 @@
             </form>
             <form class="panel form-grid" id="configForm">
               <h2>Operacion</h2>
-              <div class="empty">${state.config.currentCutId ? `Corte activo: ${cutLabel(state.config.cuts.find(cut => cut.id === state.config.currentCutId))}` : "Sin corte activo. Al abrir cocina se iniciará uno nuevo."}</div>
+              <div class="empty">${state.config.currentCutId ? `Corte activo: ${cutLabel(state.config.cuts.find(cut => cut.id === state.config.currentCutId))}` : "Sin corte activo. Al abrir cocina se iniciara uno nuevo."}</div>
               <label>Cocina
                 <select id="kitchenOpen">
                   <option value="true" ${state.config.kitchenOpen ? "selected" : ""}>Abierta</option>
@@ -902,12 +1065,12 @@
               <tbody>
                 ${state.products.map(p => `
                   <tr>
-                    <td>${p.emoji || "🍽"} ${p.name}</td>
+                    <td><img class="product-thumb" src="${escapeAttr(productImage(p))}" alt="" loading="lazy">${p.name}</td>
                     <td>${money(p.price)}</td>
                     <td>${p.stock}</td>
                     <td class="row" style="justify-content:flex-end">
-                      <button class="icon-btn ghost" title="Editar" data-edit="${p.id}">✎</button>
-                      <button class="icon-btn danger" title="Eliminar" data-delete="${p.id}">×</button>
+                      <button class="icon-btn ghost" title="Editar" data-edit="${p.id}">Editar</button>
+                      <button class="icon-btn danger" title="Eliminar" data-delete="${p.id}">x</button>
                     </td>
                   </tr>
                 `).join("")}
@@ -931,6 +1094,7 @@
         id: crypto.randomUUID(),
         customerName: form.customerName.value.trim(),
         customerPhone: form.customerPhone.value.trim(),
+        customerDepartment: form.customerDepartment.value.trim(),
         pickupTime: form.pickupTime.value,
         items: lines,
         status: "recibido",
@@ -947,7 +1111,7 @@
       state.orders.unshift(order);
       cart = {};
       saveState(false);
-      emit("order", "Nuevo pedido recibido", `${order.customerName} · ${money(orderTotal(order))}`, "new");
+      emit("order", "Nuevo pedido recibido", `${order.customerName} - ${money(orderTotal(order))}`, "new");
       render();
     }
     async function updateStatus(id, status) {
@@ -1026,7 +1190,7 @@
         createOrder: "Registrando pedido",
         updateOrder: "Actualizando pedido",
         products: "Guardando productos",
-        config: "Guardando operación"
+        config: "Guardando operacion"
       };
       setProgress(true, labels[action] || "Procesando cambio", "Registrando datos en la base...");
       try {
@@ -1043,7 +1207,7 @@
     }
     function submitHiddenForm(url, fields) {
       return new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => reject(new Error("El servicio tardó demasiado en responder")), 15000);
+        const timeout = setTimeout(() => reject(new Error("El servicio tardo demasiado en responder")), 15000);
         fetch(url, {
           method: "POST",
           mode: "no-cors",
@@ -1067,7 +1231,7 @@
         const timeout = setTimeout(() => {
           delete window[callback];
           script.remove();
-          reject(new Error("El servicio no respondió"));
+          reject(new Error("El servicio no respondio"));
         }, 12000);
         window[callback] = data => {
           clearTimeout(timeout);
@@ -1099,8 +1263,8 @@
         saveState(false);
         const newOrders = state.orders.filter(order => !knownIds.has(order.id) && order.status === "recibido");
         document.getElementById("syncStatus").textContent = silent ? `Sincronizado ${nowTime()}` : "Conectado a la base";
-        if (!silent) emit("sync", "Sincronización completa", "Productos y pedidos cargados.", "soft");
-        if (silent && newOrders.length) emit("order", "Pedido nuevo no atendido", `${newOrders.length} pedido(s) entraron a recepción.`, "new");
+        if (!silent) emit("sync", "Sincronizacion completa", "Productos y pedidos cargados.", "soft");
+        if (silent && newOrders.length) emit("order", "Pedido nuevo no atendido", `${newOrders.length} pedido(s) entraron a recepcion.`, "new");
         render();
       } catch {
         if (!silent) document.getElementById("syncStatus").textContent = "Modo local: revisa la URL";
@@ -1125,7 +1289,7 @@
       }
       if (target.dataset.whatsapp) {
         const order = state.orders.find(item => item.id === target.dataset.whatsapp);
-        if (order) window.open(whatsappUrl(order), "_blank", "noopener");
+        if (order) shareWhatsappOrder(order);
       }
       if (target.dataset.back) backOrder(target.dataset.back);
       if (target.dataset.cancel) {
@@ -1135,7 +1299,7 @@
       if (target.dataset.edit) {
         const p = state.products.find(product => product.id === target.dataset.edit);
         productId.value = p.id; productName.value = p.name; productPrice.value = p.price;
-        productStock.value = p.stock; productEmoji.value = p.emoji || ""; productActive.value = String(p.active !== false);
+        productStock.value = p.stock; productEmoji.value = p.emoji || ""; productImageUrl.value = p.imageUrl || p.image || p.photo || p.picture || ""; productActive.value = String(p.active !== false);
         productFormTitle.textContent = "Editar producto";
       }
       if (target.dataset.delete) {
@@ -1169,7 +1333,8 @@
           name: productName.value.trim(),
           price: Number(productPrice.value),
           stock: Number(productStock.value),
-          emoji: productEmoji.value.trim() || "🍽",
+          emoji: productEmoji.value.trim(),
+          imageUrl: productImageUrl.value.trim(),
           active: productActive.value === "true"
         };
         const index = state.products.findIndex(p => p.id === product.id);
@@ -1188,7 +1353,7 @@
       if (event.target.id === "configForm") {
         const windows = parseDeliveryWindows(deliveryWindows.value);
         if (!windows.length) {
-          emit("config", "Horarios inválidos", "Usa rangos como 09:00-12:00.", "soft");
+          emit("config", "Horarios invalidos", "Usa rangos como 09:00-12:00.", "soft");
           return;
         }
         const previousConfig = {
@@ -1211,7 +1376,7 @@
           return;
         }
         saveState(false);
-        emit("config", "Operación actualizada", state.config.kitchenOpen ? "Cocina abierta" : "Cocina cerrada", "soft");
+        emit("config", "Operacion actualizada", state.config.kitchenOpen ? "Cocina abierta" : "Cocina cerrada", "soft");
         render();
       }
       if (event.target.id === "payForm") {
@@ -1246,18 +1411,18 @@
     });
     document.getElementById("testApi").addEventListener("click", async () => {
       localStorage.setItem(API_KEY, document.getElementById("apiUrl").value.trim());
-      document.getElementById("syncStatus").textContent = "Probando conexión...";
+      document.getElementById("syncStatus").textContent = "Probando conexion...";
       try {
         const data = await callJsonp(getApiUrl(), { action: "bootstrap" });
-        if (!data.ok) throw new Error(data.error || "El script respondió sin ok");
-        document.getElementById("syncStatus").textContent = `Conexión OK: ${data.products?.length || 0} productos`;
+        if (!data.ok) throw new Error(data.error || "El script respondio sin ok");
+        document.getElementById("syncStatus").textContent = `Conexion OK: ${data.products?.length || 0} productos`;
       } catch (error) {
-        document.getElementById("syncStatus").textContent = `Error de conexión: ${error.message}`;
+        document.getElementById("syncStatus").textContent = `Error de conexion: ${error.message}`;
       }
     });
     document.getElementById("enableSound").addEventListener("click", () => {
       audioReady = true;
-      emit("sound", "Sonido activado", "Las alertas emitirán tonos diferenciados.", "ready");
+      emit("sound", "Sonido activado", "Las alertas emitiran tonos diferenciados.", "ready");
     });
     document.getElementById("enableNotifications").addEventListener("click", enableNotifications);
     window.addEventListener("storage", event => {
@@ -1279,3 +1444,19 @@
   </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
