@@ -360,6 +360,20 @@
     .warn { background: linear-gradient(135deg, #dc2626, #991b1b); }
     .danger { background: linear-gradient(135deg, #991b1b, #5f1212); }
     .product-thumb { width: 46px; height: 36px; object-fit: cover; border-radius: 8px; vertical-align: middle; margin-right: 8px; box-shadow: 0 6px 14px rgba(38,20,11,.16); }
+    .image-preview {
+      width: 100%;
+      min-height: 120px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: #fff;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .image-preview img { width: 100%; height: 160px; object-fit: cover; display: block; }
     .modal-backdrop { background: rgba(20,12,8,.62); backdrop-filter: blur(8px); }
   </style>
 </head>
@@ -479,11 +493,40 @@
       return normalizeProductText(product.name).slice(0, 1).toUpperCase() || "C";
     }
     function productImage(product) {
-      const direct = product.imageUrl || product.image || product.photo || product.picture;
+      const direct = product.imageData || product.imageUrl || product.image || product.photo || product.picture;
       if (direct) return direct;
       const name = normalizeProductText(product.name);
       const match = PRODUCT_IMAGE_FALLBACKS.find(item => item.words.some(word => name.includes(word)));
       return match ? match.url : DEFAULT_PRODUCT_IMAGE;
+    }
+    function setImagePreview(src) {
+      const preview = document.getElementById("productImagePreview");
+      if (!preview) return;
+      if (src) preview.innerHTML = `<img src="${escapeAttr(src)}" alt="Vista previa">`;
+      else preview.textContent = "Sin imagen cargada";
+    }
+    function resizeImageFile(file) {
+      return new Promise((resolve, reject) => {
+        if (!file) return resolve("");
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("No se pudo leer la imagen"));
+        reader.onload = () => {
+          const img = new Image();
+          img.onerror = () => reject(new Error("Formato de imagen no compatible"));
+          img.onload = () => {
+            const max = 520;
+            const scale = Math.min(1, max / Math.max(img.width, img.height));
+            const canvas = document.createElement("canvas");
+            canvas.width = Math.max(1, Math.round(img.width * scale));
+            canvas.height = Math.max(1, Math.round(img.height * scale));
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL("image/jpeg", 0.72));
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
     }
 
     function loadState() {
@@ -1029,6 +1072,11 @@
               <label>Stock<input id="productStock" type="number" min="0" step="1" required></label>
               <label>Etiqueta corta<input id="productEmoji" maxlength="3" placeholder="CA"></label>
               <label>Foto del producto<input id="productImageUrl" type="url" placeholder="https://..."></label>
+              <label>Imagen desde este dispositivo
+                <input id="productImageFile" type="file" accept="image/*">
+              </label>
+              <input type="hidden" id="productImageData">
+              <div class="image-preview" id="productImagePreview">Sin imagen cargada</div>
               <label>Estado
                 <select id="productActive">
                   <option value="true">Activo</option>
@@ -1299,7 +1347,8 @@
       if (target.dataset.edit) {
         const p = state.products.find(product => product.id === target.dataset.edit);
         productId.value = p.id; productName.value = p.name; productPrice.value = p.price;
-        productStock.value = p.stock; productEmoji.value = p.emoji || ""; productImageUrl.value = p.imageUrl || p.image || p.photo || p.picture || ""; productActive.value = String(p.active !== false);
+        productStock.value = p.stock; productEmoji.value = p.emoji || ""; productImageUrl.value = p.imageUrl || ""; productImageData.value = p.imageData || p.image || p.photo || p.picture || ""; productActive.value = String(p.active !== false);
+        setImagePreview(productImage(p));
         productFormTitle.textContent = "Editar producto";
       }
       if (target.dataset.delete) {
@@ -1321,6 +1370,8 @@
       if (target.id === "clearProduct") {
         productForm.reset();
         productId.value = "";
+        productImageData.value = "";
+        setImagePreview("");
         productFormTitle.textContent = "Alta de producto";
       }
     });
@@ -1335,6 +1386,7 @@
           stock: Number(productStock.value),
           emoji: productEmoji.value.trim(),
           imageUrl: productImageUrl.value.trim(),
+          imageData: productImageData.value,
           active: productActive.value === "true"
         };
         const index = state.products.findIndex(p => p.id === product.id);
@@ -1396,11 +1448,26 @@
     });
     document.addEventListener("input", event => {
       if (event.target.id === "amountReceived") calcChange();
+      if (event.target.id === "productImageUrl") {
+        productImageData.value = "";
+        setImagePreview(event.target.value.trim());
+      }
     });
     document.addEventListener("change", event => {
       if (event.target.id === "cutFilter") {
         reportCutFilter = event.target.value;
         renderReports();
+      }
+      if (event.target.id === "productImageFile") {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        resizeImageFile(file).then(dataUrl => {
+          productImageData.value = dataUrl;
+          productImageUrl.value = "";
+          setImagePreview(dataUrl);
+        }).catch(error => {
+          emit("product", "Imagen no cargada", error.message, "soft");
+        });
       }
     });
     document.getElementById("closePay").addEventListener("click", () => document.getElementById("payModal").classList.remove("show"));
@@ -1444,13 +1511,6 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
 
 
 
