@@ -12,7 +12,7 @@
     window.FIESTA_API_URL = 'https://script.google.com/macros/s/AKfycbxRhUMtLUX8wg8bfq2VubzhhSfE_7gh0zM6NpWrQTA5cu6WIkysuFdBqfMt6wjyU_bCMA/exec';
   </script>
 </head>
-<body>
+<body class="guest-only">
   <div class="background-carousel" aria-hidden="true">
     <div class="bg-slide bg-one"></div>
     <div class="bg-slide bg-two"></div>
@@ -31,11 +31,6 @@
         <span aria-hidden="true">⚙</span>
       </button>
     </header>
-
-    <nav class="tabs" aria-label="Secciones">
-      <button class="tab active" type="button" data-view="guestView">Invitado</button>
-      <button class="tab" type="button" data-view="kitchenView">Cocina</button>
-    </nav>
 
     <main>
       <section id="guestView" class="view active">
@@ -81,46 +76,6 @@
 
           <div id="guestHistory" class="guest-history"></div>
         </aside>
-      </section>
-
-      <section id="kitchenView" class="view">
-        <div id="kitchenDashboard" class="kitchen-dashboard">
-          <section class="summary-grid" id="summaryGrid"></section>
-
-          <section class="kitchen-controls">
-            <div class="segmented" id="statusFilter" aria-label="Filtro de estado">
-              <button type="button" class="active" data-status="">Todos</button>
-              <button type="button" data-status="NUEVO">Nuevos</button>
-              <button type="button" data-status="PREPARANDO">Preparando</button>
-              <button type="button" data-status="LISTO">Listos</button>
-              <button type="button" data-status="ENTREGADO">Entregados</button>
-            </div>
-            <input id="kitchenSearch" class="search" placeholder="Buscar folio, nombre o mesa">
-          </section>
-
-          <section class="kitchen-layout">
-            <div>
-              <div class="section-head">
-                <div>
-                  <h2>Pedidos</h2>
-                  <p id="lastSyncText">Sin sincronizar</p>
-                </div>
-                <button class="secondary-button" id="refreshKitchenButton" type="button">Actualizar</button>
-              </div>
-              <div id="ordersList" class="orders-list"></div>
-            </div>
-
-            <aside class="availability-panel">
-              <div class="section-head compact">
-                <div>
-                  <h2>Disponibilidad</h2>
-                  <p>Se refleja en el menú del invitado.</p>
-                </div>
-              </div>
-              <div id="availabilityList" class="availability-list"></div>
-            </aside>
-          </section>
-        </div>
       </section>
     </main>
   </div>
