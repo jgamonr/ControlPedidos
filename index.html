@@ -24,7 +24,7 @@
   <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
   <script>
-    window.FIESTA_API_URL = 'https://script.google.com/macros/s/AKfycbwrZeGWjKtqbt_GHZlNlZVNZyGzjopU4-bm6kDfeadOg6oyt-iWD2XGabOVT1fBx2N-Iw/exec';
+    window.FIESTA_API_URL = 'https://script.google.com/macros/s/AKfycbx4dDV5CKR5L5pXdB4foNgCINhN8P5d-nyhVXfWXvgzmGEAK0sdDKgHXVOoAhdwphD6JQ/exec';
     window.FIESTA_GUEST_APP_URL = 'https://jgamonr.github.io/pedidos/';
   </script>
 </head>
@@ -111,6 +111,14 @@
         <div id="kitchenDashboard" class="kitchen-dashboard">
           <section class="summary-grid" id="summaryGrid"></section>
 
+          <section class="kitchen-mode-panel">
+            <div>
+              <strong id="kitchenModeText">Cocina abierta</strong>
+              <span>Cuando se cierre, los invitados no podr&aacute;n enviar pedidos nuevos.</span>
+            </div>
+            <button class="secondary-button" id="toggleKitchenButton" type="button">Cerrar cocina</button>
+          </section>
+
           <section class="kitchen-controls">
             <div class="segmented" id="statusFilter" aria-label="Filtro de estado">
               <button type="button" class="active" data-status="">Todos</button>
@@ -156,7 +164,7 @@
         URL de Apps Script
         <input id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
       </label>
-      <p>Esta URL se guarda solo en este dispositivo. Los pedidos se guardan en Google Sheets.</p>
+      <p>Esta URL se guarda solo en este dispositivo. Los pedidos se guardan en el sistema.</p>
       <div class="dialog-actions">
         <button class="secondary-button" value="cancel">Cancelar</button>
         <button class="primary-button" id="saveSettingsButton" value="default">Guardar</button>
@@ -171,6 +179,15 @@
       <h2 id="statusModalTitle">Tu pedido cambió de estado</h2>
       <p id="statusModalMessage">Cocina actualizó tu pedido.</p>
       <button class="primary-button" id="statusModalClose" value="default">Entendido</button>
+    </form>
+  </dialog>
+
+  <dialog id="appMessageDialog" class="status-dialog">
+    <form method="dialog" class="status-modal app-message-modal">
+      <div id="appMessageIcon" class="status-modal-icon" aria-hidden="true">!</div>
+      <span id="appMessageBadge" class="status-badge status-NUEVO">AVISO</span>
+      <h2 id="appMessageTitle">Aviso</h2>
+      <p id="appMessageText">Operacion realizada.</p>
     </form>
   </dialog>
 
