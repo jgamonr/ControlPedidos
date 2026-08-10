@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0f766e">
-  <title>Fiesta Pedidos</title>
-  <meta name="description" content="Haz tu pedido de alimentos y bebidas para la fiesta privada.">
+  <meta name="theme-color" content="#b45d3c">
+  <title>MOTIVO Alimentos &amp; Eventos</title>
+  <meta name="description" content="Haz tu pedido privado para el evento atendido por MOTIVO Alimentos &amp; Eventos.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Pedidos">
   <meta property="og:title" content="Pedidos de Fiesta">
@@ -21,10 +21,11 @@
   <meta name="twitter:description" content="Pide hamburguesas, hot dogs y bebidas desde tu celular.">
   <meta name="twitter:image" content="https://jgamonr.github.io/pedidos/assets/og/og-pedidos.jpg">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="./assets/motivo-simbolo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
   <script>
-    window.FIESTA_API_URL = 'https://script.google.com/macros/s/AKfycbxRhUMtLUX8wg8bfq2VubzhhSfE_7gh0zM6NpWrQTA5cu6WIkysuFdBqfMt6wjyU_bCMA/exec';
+    window.FIESTA_API_URL = 'https://script.google.com/macros/s/AKfycbx4dDV5CKR5L5pXdB4foNgCINhN8P5d-nyhVXfWXvgzmGEAK0sdDKgHXVOoAhdwphD6JQ/exec';
+    window.FIESTA_GUEST_APP_URL = 'https://jgamonr.github.io/pedidos/';
   </script>
 </head>
 <body class="guest-only">
@@ -36,9 +37,9 @@
   <div class="app-shell">
     <header class="topbar">
       <div class="brand">
-        <img src="./assets/icon.svg" alt="" class="brand-icon">
+        <img src="./assets/motivo-simbolo.svg" alt="" class="brand-icon">
         <div>
-          <h1>Fiesta Pedidos</h1>
+          <h1><span>MOTIVO</span><small>Alimentos &amp; Eventos</small></h1>
           <p id="connectionText">Conectando...</p>
         </div>
       </div>
@@ -51,9 +52,13 @@
       <section id="guestView" class="view active">
         <section class="order-panel">
           <div class="section-head">
-            <div>
-              <h2>Menú</h2>
-              <p>Selecciona alimentos y bebidas incluidos en el evento.</p>
+            <div class="motivo-menu-heading">
+              <img src="./assets/motivo-simbolo.svg" alt="" class="motivo-symbol">
+              <div>
+                <span class="brand-eyebrow">MOTIVO Alimentos &amp; Eventos</span>
+                <h2>Men&uacute;</h2>
+                <p>Cada reuni&oacute;n tiene un motivo. Selecciona alimentos y bebidas incluidos en el evento.</p>
+              </div>
             </div>
           </div>
           <div id="menuList" class="menu-list" aria-live="polite"></div>
@@ -73,6 +78,11 @@
           <div id="cartItems" class="cart-items empty">Agrega productos del menú.</div>
 
           <form id="orderForm" class="order-form">
+            <label>
+              Tel&eacute;fono
+              <input id="guestPhone" name="guestPhone" inputmode="tel" autocomplete="tel" required maxlength="20" placeholder="Ej. 664 123 4567">
+              <span class="field-hint">Se guardar&aacute; en este tel&eacute;fono para consultar tus pedidos.</span>
+            </label>
             <label>
               Nombre
               <input id="guestName" name="guestName" autocomplete="name" required maxlength="80" placeholder="Ej. Ana">
@@ -131,6 +141,15 @@
       <h2 id="statusModalTitle">Tu pedido cambió de estado</h2>
       <p id="statusModalMessage">Cocina actualizó tu pedido.</p>
       <button class="primary-button" id="statusModalClose" value="default">Entendido</button>
+    </form>
+  </dialog>
+
+  <dialog id="appMessageDialog" class="status-dialog">
+    <form method="dialog" class="status-modal app-message-modal">
+      <div id="appMessageIcon" class="status-modal-icon" aria-hidden="true">!</div>
+      <span id="appMessageBadge" class="status-badge status-NUEVO">AVISO</span>
+      <h2 id="appMessageTitle">Aviso</h2>
+      <p id="appMessageText">Operacion realizada.</p>
     </form>
   </dialog>
 

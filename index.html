@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0f766e">
-  <title>Fiesta Pedidos</title>
-  <meta name="description" content="Panel de control de pedidos para cocina y recepción del evento.">
+  <meta name="theme-color" content="#b45d3c">
+  <title>MOTIVO Alimentos &amp; Eventos</title>
+  <meta name="description" content="Pedidos privados para eventos atendidos por MOTIVO Alimentos &amp; Eventos.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Control Pedidos">
   <meta property="og:title" content="Control Pedidos">
@@ -21,7 +21,7 @@
   <meta name="twitter:description" content="Cocina y recepción para pedidos de alimentos y bebidas en evento privado.">
   <meta name="twitter:image" content="https://jgamonr.github.io/ControlPedidos/assets/og/og-controlpedidos.jpg">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="./assets/motivo-simbolo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
   <script>
     window.FIESTA_API_URL = 'https://script.google.com/macros/s/AKfycbx4dDV5CKR5L5pXdB4foNgCINhN8P5d-nyhVXfWXvgzmGEAK0sdDKgHXVOoAhdwphD6JQ/exec';
@@ -37,9 +37,9 @@
   <div class="app-shell">
     <header class="topbar">
       <div class="brand">
-        <img src="./assets/icon.svg" alt="" class="brand-icon">
+        <img src="./assets/motivo-simbolo.svg" alt="" class="brand-icon">
         <div>
-          <h1>Fiesta Pedidos</h1>
+          <h1><span>MOTIVO</span><small>Alimentos &amp; Eventos</small></h1>
           <p id="connectionText">Conectando...</p>
         </div>
       </div>
@@ -57,9 +57,13 @@
       <section id="guestView" class="view active">
         <section class="order-panel">
           <div class="section-head">
-            <div>
-              <h2>Menú</h2>
-              <p>Selecciona alimentos y bebidas incluidos en el evento.</p>
+            <div class="motivo-menu-heading">
+              <img src="./assets/motivo-simbolo.svg" alt="" class="motivo-symbol">
+              <div>
+                <span class="brand-eyebrow">MOTIVO Alimentos &amp; Eventos</span>
+                <h2>Men&uacute;</h2>
+                <p>Cada reuni&oacute;n tiene un motivo. Selecciona alimentos y bebidas incluidos en el evento.</p>
+              </div>
             </div>
           </div>
           <div id="menuList" class="menu-list" aria-live="polite"></div>
